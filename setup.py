@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='table copy',
-    version='0.2',
+    version='0.3',
     url='http://github.com/gonzomember/table-copy',
     author=u'Paweł Gorzelany',
     author_email='pawel.gorzelany@gmail.com',

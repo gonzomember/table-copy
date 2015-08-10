@@ -52,7 +52,14 @@ def main():
     """
     parser = make_parser()
     args = parser.parse_args()
-    copy_table(args.table, args.source, args.target, args.batch)
+    if args.source[:-1] == args.target[:-1]:
+        # we are on the same database with the same credentials so we can do
+        with mysql.connect(*args.target) as db:
+            db.execute('insert into {} select * from {}.{}'.format(
+                args.table, args.source[-1], args.table))
+    else:
+        # otherwise call the copy_table function
+        copy_table(args.table, args.source, args.target, args.batch)
 
 
 if __name__ == '__main__':

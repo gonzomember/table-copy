@@ -20,3 +20,9 @@ By timing the script on the test database table it showed some improvement.
 Before the script completed in `~33s` after this improvement it comleted in `~9.5s`.
 The script got also more flexible since it is possible to copy any table by providing it's name as the first positional argument to the script.
 There are still some problems however. Main one is that `MySQLdb` does not provide interpolation of table names in query strings, thus forcing to use regular python string formatting which is not protected against SQL injection.
+
+#### final version
+
+In the final version I added special case when both databases are on the same server.
+Then copying is done without fetching any data entirely on the database server.
+This sped things up by `~2s` taking the script to complete in `~7.5s` if both databases were in fact on the same server.
