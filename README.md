@@ -12,7 +12,7 @@ it is however strongly encouraged to do so inside a `virtualenv`.
 
 To run it, just type:
 ```sh
-$ table-copy <table name> --source <source-host> <source-user> <source-pass> <source-db> --target <target-host> <target-user> <target-pass> <source-db>
+$ table-copy <table name> --source <source-host> <source-user> <source-pass> <source-db> --target <target-host> <target-user> <target-pass> <target-db>
 ```
 
 #### Setting up for development
