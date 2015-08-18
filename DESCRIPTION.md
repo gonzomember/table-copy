@@ -26,3 +26,7 @@ There are still some problems however. Main one is that `MySQLdb` does not provi
 In the final version I added special case when both databases are on the same server.
 Then copying is done without fetching any data entirely on the database server.
 This sped things up by `~2s` taking the script to complete in `~7.5s` if both databases were in fact on the same server.
+
+#### memory efficient version
+
+The problem with the previous version was that the default `cursorclass` used by `MySQLdb` fetches the whole result set and creates a python object from that. So even using `fetchone` or `fetchmany` does not guarantee constant memory usage not related to table size. This version uses `SSCursor` class which keeps the resultset on the server and actually performs every query with constant memory usage when used with `fetchone` or `fetchmany`.

@@ -42,8 +42,8 @@ class TableCopyTests(TestCase):
         self.assertEqual(parsed.target, target_args[1:])
         self.assertEqual(parsed.batch, 1000)
 
-    @mock.patch('table_copy.table_copy.mysql')
-    def test_copy_table_db_connections_setup(self, mysql):
+    @mock.patch('table_copy.table_copy.connect')
+    def test_copy_table_db_connections_setup(self, connect):
         """Check whether two seperate db connections were made, and both used
         as context managers to handle transaction commit or rollback on errors.
         """
@@ -55,13 +55,13 @@ class TableCopyTests(TestCase):
         # we have to patch the fetchmany method on the cursor in order not to
         # get an infinite loop in the `while` loop
         source.__enter__.return_value.fetchmany.return_value = []
-        mysql.connect.side_effect = [source, target]
+        connect.side_effect = [source, target]
         # we invoke the function being tested
         table_copy.copy_table('table', ['hosta', 'usera'],
                               ['hostb', 'userb'], 4)
         # check if the `connect` method was called twice with proper arguments
-        self.assertEqual(mysql.connect.call_count, 2)
-        self.assertEqual(mysql.connect.call_args_list,
+        self.assertEqual(connect.call_count, 2)
+        self.assertEqual(connect.call_args_list,
                          [mock.call('hosta', 'usera'),
                           mock.call('hostb', 'userb')])
         # we also check if objects returned by those two `connect` calls were
@@ -71,8 +71,8 @@ class TableCopyTests(TestCase):
         target.__enter__.assert_called_once_with()
         self.assertEqual(source.__exit__.call_count, 1)
 
-    @mock.patch('table_copy.table_copy.mysql')
-    def test_copy_titles_query_execution(self, mysql):
+    @mock.patch('table_copy.table_copy.connect')
+    def test_copy_titles_query_execution(self, connect):
         """Check whether queries are executed properly.
         """
         select_query = 'select * from titles'
@@ -90,7 +90,7 @@ class TableCopyTests(TestCase):
         target.__enter__.return_value = target_cursor
         # the connect functions should return both our connection objects
         # on subsequent calls
-        mysql.connect.side_effect = [source, target]
+        connect.side_effect = [source, target]
         # invoke the function being tested and do some checks
         table_copy.copy_table('titles', [], [], 4)
         source_cursor.execute.assert_called_once_with(select_query)

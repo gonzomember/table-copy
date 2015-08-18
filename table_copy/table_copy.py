@@ -1,7 +1,13 @@
 #! /usr/bin/env python
 import argparse
+from functools import partial
 
 import MySQLdb as mysql
+from MySQLdb.cursors import SSCursor
+
+# for every connection we would like to use the SSCursor as cursorclass
+# so we will partially apply that to the mysql.connect function
+connect = partial(mysql.connect, cursorclass=SSCursor)
 
 
 def make_query(table_name, columns):
@@ -16,7 +22,7 @@ def copy_table(table_name, source, target, n):
     """This function copies the actual data.
     """
     # set up two connections
-    with mysql.connect(*source) as source, mysql.connect(*target) as target:
+    with connect(*source) as source, connect(*target) as target:
         # run the select query
         source.execute('select * from {table}'.format(table=table_name))
         # prepare the insert query
@@ -54,7 +60,7 @@ def main():
     args = parser.parse_args()
     if args.source[:-1] == args.target[:-1]:
         # we are on the same database with the same credentials so we can do
-        with mysql.connect(*args.target) as db:
+        with connect(*args.target) as db:
             db.execute('insert into {} select * from {}.{}'.format(
                 args.table, args.source[-1], args.table))
     else:
